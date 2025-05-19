@@ -1,0 +1,103 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Noeud {
+    int valeur;
+    struct Noeud* suivant;
+} Noeud;
+
+void push(Noeud** top, int valeur) {
+    Noeud* nouveau = malloc(sizeof(Noeud));
+    nouveau->valeur = valeur;
+    nouveau->suivant = *top;
+    *top = nouveau;
+}
+
+void pop(Noeud** top) {
+    if (*top == NULL) return;
+    Noeud* temp = *top;
+    *top = (*top)->suivant;
+    free(temp);
+}
+
+void peek(Noeud* top) {
+    if (top != NULL)
+        printf("Sommet: %d\n", top->valeur);
+}
+
+void afficherPile(Noeud* top) {
+    Noeud* courant = top;
+    while (courant != NULL) {
+        printf("%d ", courant->valeur);
+        courant = courant->suivant;
+    }
+    printf("\n");
+}
+
+int taille(Noeud* top) {
+    int count = 0;
+    while (top != NULL) {
+        count++;
+        top = top->suivant;
+    }
+    return count;
+}
+
+void Enfiler(Noeud** tete, Noeud** queue, int valeur) {
+    Noeud* nouveau = malloc(sizeof(Noeud));
+    nouveau->valeur = valeur;
+    nouveau->suivant = NULL;
+    if (*queue == NULL) {
+        *tete = *queue = nouveau;
+    } else {
+        (*queue)->suivant = nouveau;
+        *queue = nouveau;
+    }
+}
+
+void Defiler(Noeud** tete) {
+    if (*tete == NULL) return;
+    Noeud* temp = *tete;
+    *tete = (*tete)->suivant;
+    free(temp);
+}
+
+void afficherFile(Noeud* tete) {
+    while (tete != NULL) {
+        printf("%d ", tete->valeur);
+        tete = tete->suivant;
+    }
+    printf("\n");
+}
+
+void viderFile(Noeud** tete) {
+    while (*tete != NULL) {
+        Defiler(tete);
+    }
+}
+
+int main() {
+    Noeud* pile = NULL;
+    push(&pile, 10);
+    push(&pile, 20);
+    push(&pile, 30);
+    afficherPile(pile);
+    peek(pile);
+    printf("Taille: %d\n", taille(pile));
+    pop(&pile);
+    pop(&pile);
+    afficherPile(pile);
+
+    Noeud* fileTete = NULL;
+    Noeud* fileQueue = NULL;
+    Enfiler(&fileTete, &fileQueue, 10);
+    Enfiler(&fileTete, &fileQueue, 20);
+    Enfiler(&fileTete, &fileQueue, 30);
+    afficherFile(fileTete);
+    Defiler(&fileTete);
+    afficherFile(fileTete);
+    Enfiler(&fileTete, &fileQueue, 40);
+    Enfiler(&fileTete, &fileQueue, 50);
+    viderFile(&fileTete);
+    return 0;
+}
