@@ -1,0 +1,143 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Voiture {
+    char marque[30];
+    char modele[30];
+    int annee;
+    float prix;
+    struct Voiture* suivant;
+    struct Voiture* precedent;
+} Voiture;
+
+Voiture* ajouterDebut(Voiture* tete, Voiture* nouv) {
+    nouv->suivant = tete;
+    nouv->precedent = NULL;
+    if (tete != NULL) tete->precedent = nouv;
+    return nouv;
+}
+
+Voiture* ajouterFin(Voiture* tete, Voiture* nouv) {
+    if (tete == NULL) return nouv;
+    Voiture* temp = tete;
+    while (temp->suivant != NULL) temp = temp->suivant;
+    temp->suivant = nouv;
+    nouv->precedent = temp;
+    nouv->suivant = NULL;
+    return tete;
+}
+
+Voiture* supprimerVoiture(Voiture* tete, char* marque) {
+    Voiture* temp = tete;
+    while (temp != NULL) {
+        if (strcmp(temp->marque, marque) == 0) {
+            if (temp->precedent != NULL)
+                temp->precedent->suivant = temp->suivant;
+            else
+                tete = temp->suivant;
+            if (temp->suivant != NULL)
+                temp->suivant->precedent = temp->precedent;
+            free(temp);
+            break;
+        }
+        temp = temp->suivant;
+    }
+    return tete;
+}
+
+void modifierVoiture(Voiture* tete, char* marque) {
+    Voiture* temp = tete;
+    while (temp != NULL) {
+        if (strcmp(temp->marque, marque) == 0) {
+            printf("Nouvelle marque: ");
+            scanf("%s", temp->marque);
+            printf("Nouveau modele: ");
+            scanf("%s", temp->modele);
+            printf("Nouvelle annee: ");
+            scanf("%d", &temp->annee);
+            printf("Nouveau prix: ");
+            scanf("%f", &temp->prix);
+            return;
+        }
+        temp = temp->suivant;
+    }
+    printf("Voiture non trouvee.\n");
+}
+
+void afficherVoitures(Voiture* tete) {
+    Voiture* temp = tete;
+    while (temp != NULL) {
+        printf("Marque: %s, Modele: %s, Annee: %d, Prix: %.2f\n",
+            temp->marque, temp->modele, temp->annee, temp->prix);
+        temp = temp->suivant;
+    }
+}
+
+Voiture* creerVoiture() {
+    Voiture* nouv = (Voiture*)malloc(sizeof(Voiture));
+    printf("Marque: ");
+    scanf("%s", nouv->marque);
+    printf("Modele: ");
+    scanf("%s", nouv->modele);
+    printf("Annee: ");
+    scanf("%d", &nouv->annee);
+    printf("Prix: ");
+    scanf("%f", &nouv->prix);
+    nouv->suivant = NULL;
+    nouv->precedent = NULL;
+    return nouv;
+}
+
+int main() {
+    Voiture* liste = NULL;
+    int choix, n, i;
+    char marque[30];
+
+    printf("Combien de voitures voulez-vous ajouter ? ");
+    scanf("%d", &n);
+    for (i = 0; i < n; i++) {
+        printf("Voiture %d:\n", i + 1);
+        Voiture* v = creerVoiture();
+        liste = ajouterFin(liste, v);
+    }
+
+    do {
+        printf("\n1. Afficher les voitures\n");
+        printf("2. Ajouter une voiture au debut\n");
+        printf("3. Ajouter une voiture Ã  la fin\n");
+        printf("4. Supprimer une voiture\n");
+        printf("5. Modifier une voiture\n");
+        printf("0. Quitter\n");
+        printf("Votre choix: ");
+        scanf("%d", &choix);
+
+        switch (choix) {
+            case 1:
+                afficherVoitures(liste);
+                break;
+            case 2:
+                liste = ajouterDebut(liste, creerVoiture());
+                break;
+            case 3:
+                liste = ajouterFin(liste, creerVoiture());
+                break;
+            case 4:
+                printf("Marque Ã  supprimer: ");
+                scanf("%s", marque);
+                liste = supprimerVoiture(liste, marque);
+                break;
+            case 5:
+                printf("Marque Ã  modifier: ");
+                scanf("%s", marque);
+                modifierVoiture(liste, marque);
+                break;
+            case 0:
+                break;
+            default:
+                printf("Choix invalide.\n");
+        }
+    } while (choix != 0);
+
+    return 0;
+}
